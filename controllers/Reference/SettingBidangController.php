@@ -4,6 +4,7 @@ namespace Controllers\Reference;
 use Controller;
 use Auth;
 use Message;
+use Session;
 use Models\Reference\SettingBidang;
 use Validator;
 use Sanitizer;
@@ -13,15 +14,28 @@ class SettingBidangController extends Controller {
         Auth::requireRole(['admin', 'manajemen']);
         
         $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-        $perPage = isset($_GET['per_page']) ? (int)$_GET['per_page'] : 10;
+        
+        // Get per_page from GET or session, default to 10
+        $validPerPage = [10, 25, 50, 100, 200, 500, 1000];
+        if (isset($_GET['per_page'])) {
+            $perPage = (int)$_GET['per_page'];
+            if (in_array($perPage, $validPerPage)) {
+                // Save to session for this module
+                Session::set('per_page_setting_bidang', $perPage);
+            } else {
+                $perPage = 10;
+            }
+        } else {
+            // Get from session, default to 10
+            $perPage = (int)Session::get('per_page_setting_bidang', 10);
+            if (!in_array($perPage, $validPerPage)) {
+                $perPage = 10;
+            }
+        }
+        
         $search = $_GET['search'] ?? '';
         $sortBy = $_GET['sort_by'] ?? 'id';
         $sortOrder = $_GET['sort_order'] ?? 'ASC';
-        
-        $validPerPage = [10, 25, 50, 100, 200, 500, 1000];
-        if (!in_array($perPage, $validPerPage)) {
-            $perPage = 10;
-        }
         
         $model = new SettingBidang();
         $items = $model->getAll($page, $perPage, $search, $sortBy, $sortOrder);

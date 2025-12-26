@@ -138,6 +138,17 @@ spl_autoload_register(function ($class) use ($baseDir) {
             return;
         }
     }
+    
+    // ZipStream namespace (for PhpSpreadsheet Excel export)
+    if (strpos($class, 'ZipStream\\') === 0) {
+        $relativeClass = substr($class, strlen('ZipStream\\'));
+        // maennchen/zipstream-php path
+        $file = $vendorDir . '/maennchen/zipstream-php/src/' . str_replace('\\', '/', $relativeClass) . '.php';
+        if (file_exists($file)) {
+            require_once $file;
+            return;
+        }
+    }
 });
 
 // Start session
@@ -234,6 +245,16 @@ $router->post('/setting-unit/create', 'Controllers\Reference\SettingUnitControll
 $router->get('/setting-unit/edit/{id}', 'Controllers\Reference\SettingUnitController', 'edit');
 $router->post('/setting-unit/edit/{id}', 'Controllers\Reference\SettingUnitController', 'edit');
 $router->get('/setting-unit/delete/{id}', 'Controllers\Reference\SettingUnitController', 'delete');
+
+// Master Akun routes (admin/manajemen only)
+$router->get('/master-akun', 'Controllers\Master\MasterAkunController', 'index');
+$router->get('/master-akun/create', 'Controllers\Master\MasterAkunController', 'create');
+$router->post('/master-akun/create', 'Controllers\Master\MasterAkunController', 'create');
+$router->get('/master-akun/edit/{id}', 'Controllers\Master\MasterAkunController', 'edit');
+$router->post('/master-akun/edit/{id}', 'Controllers\Master\MasterAkunController', 'edit');
+$router->get('/master-akun/delete/{id}', 'Controllers\Master\MasterAkunController', 'delete');
+$router->get('/master-akun/export/excel', 'Controllers\Master\MasterAkunController', 'exportExcel');
+$router->get('/master-akun/export/pdf', 'Controllers\Master\MasterAkunController', 'exportPdf');
 
 // Dispatch
 $router->dispatch();

@@ -393,6 +393,12 @@ if (Auth::check() && $currentUser): ?><header class="app-header">
                     <span>Manajemen User</span>
                 </a>
                 
+                <!-- Menu Master Akun -->
+                <a href="/master-akun" class="sidebar-nav-item <?= strpos($_SERVER['REQUEST_URI'] ?? '', '/master-akun') !== false ? 'active' : '' ?>">
+                    <?= icon('at', 'me-2', 20) ?>
+                    <span>Master Akun</span>
+                </a>
+                
                 <!-- Menu Daftar Log Dropdown -->
                 <?php
                 $currentPath = $_SERVER['REQUEST_URI'] ?? '';
