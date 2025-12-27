@@ -1,15 +1,16 @@
 <?php
-namespace Controllers\Reference;
+namespace Controllers\Master;
 
 use Controller;
 use Auth;
 use Message;
 use Session;
-use Models\Reference\SettingBidang;
+use Models\Master\SettingBagian;
+use Models\Common\User;
 use Validator;
 use Sanitizer;
 
-class SettingBidangController extends Controller {
+class SettingBagianController extends Controller {
     public function index() {
         Auth::requireRole(['admin', 'manajemen']);
         
@@ -21,13 +22,13 @@ class SettingBidangController extends Controller {
             $perPage = (int)$_GET['per_page'];
             if (in_array($perPage, $validPerPage)) {
                 // Save to session for this module
-                Session::set('per_page_setting_bidang', $perPage);
+                Session::set('per_page_setting_bagian', $perPage);
             } else {
                 $perPage = 10;
             }
         } else {
             // Get from session, default to 10
-            $perPage = (int)Session::get('per_page_setting_bidang', 10);
+            $perPage = (int)Session::get('per_page_setting_bagian', 10);
             if (!in_array($perPage, $validPerPage)) {
                 $perPage = 10;
             }
@@ -37,7 +38,7 @@ class SettingBidangController extends Controller {
         $sortBy = $_GET['sort_by'] ?? 'id';
         $sortOrder = $_GET['sort_order'] ?? 'ASC';
         
-        $model = new SettingBidang();
+        $model = new SettingBagian();
         $items = $model->getAll($page, $perPage, $search, $sortBy, $sortOrder);
         $total = $model->count($search);
         $totalPages = $perPage > 0 ? (int)ceil($total / $perPage) : 1;
@@ -53,12 +54,15 @@ class SettingBidangController extends Controller {
             'sortOrder' => $sortOrder
         ];
         
-        $this->view('Reference/setting-bidang/index', $data);
+        $this->view('Master/setting-bagian/index', $data);
     }
     
     public function create() {
         Auth::requireRole(['admin', 'manajemen']);
         
+        $userModel = new User();
+        $users = $userModel->getAll(1, 1000, '', 'namalengkap', 'ASC');
+        
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $postData = Sanitizer::post($_POST);
             
@@ -70,14 +74,16 @@ class SettingBidangController extends Controller {
             }
             
             $data = [
-                'namabidang' => Sanitizer::string($postData['namabidang'] ?? ''),
+                'namabagian' => Sanitizer::string($postData['namabagian'] ?? ''),
                 'pengelola_akun' => $pengelolaAkun,
+                'jabatan_pimpinan' => !empty($postData['jabatan_pimpinan']) ? Sanitizer::string($postData['jabatan_pimpinan']) : null,
+                'id_pimpinan' => !empty($postData['id_pimpinan']) ? (int)$postData['id_pimpinan'] : null,
                 'status' => Sanitizer::string($postData['status'] ?? 'aktif')
             ];
             
             $validator = new Validator($data);
             $rules = [
-                'namabidang' => 'required|min:2|max:255',
+                'namabagian' => 'required|min:2|max:255',
                 'pengelola_akun' => 'in:true,false,1,0',
                 'status' => 'required|in:aktif,nonaktif'
             ];
@@ -85,30 +91,33 @@ class SettingBidangController extends Controller {
             if (!$validator->validate($rules)) {
                 $firstError = array_values($validator->errors())[0][0] ?? 'Validasi gagal';
                 Message::error($firstError);
-                $this->redirect('/setting-bidang/create');
+                $this->redirect('/setting-bagian/create');
             }
             
-            $model = new SettingBidang();
+            $model = new SettingBagian();
             $model->create($data);
             
-            Message::success('Setting Bidang berhasil ditambahkan');
-            $this->redirect('/setting-bidang');
+            Message::success('Setting Bagian berhasil ditambahkan');
+            $this->redirect('/setting-bagian');
         }
         
-        $data = [];
-        $this->view('Reference/setting-bidang/create', $data);
+        $data = ['users' => $users];
+        $this->view('Master/setting-bagian/create', $data);
     }
     
     public function edit($id) {
         Auth::requireRole(['admin', 'manajemen']);
         
-        $model = new SettingBidang();
+        $model = new SettingBagian();
         $item = $model->findById($id);
         
         if (!$item) {
-            Message::error('Setting Bidang tidak ditemukan');
-            $this->redirect('/setting-bidang');
+            Message::error('Setting Bagian tidak ditemukan');
+            $this->redirect('/setting-bagian');
         }
+        
+        $userModel = new User();
+        $users = $userModel->getAll(1, 1000, '', 'namalengkap', 'ASC');
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $postData = Sanitizer::post($_POST);
@@ -121,14 +130,16 @@ class SettingBidangController extends Controller {
             }
             
             $data = [
-                'namabidang' => Sanitizer::string($postData['namabidang'] ?? ''),
+                'namabagian' => Sanitizer::string($postData['namabagian'] ?? ''),
                 'pengelola_akun' => $pengelolaAkun,
+                'jabatan_pimpinan' => !empty($postData['jabatan_pimpinan']) ? Sanitizer::string($postData['jabatan_pimpinan']) : null,
+                'id_pimpinan' => !empty($postData['id_pimpinan']) ? (int)$postData['id_pimpinan'] : null,
                 'status' => Sanitizer::string($postData['status'] ?? 'aktif')
             ];
             
             $validator = new Validator($data);
             $rules = [
-                'namabidang' => 'required|min:2|max:255',
+                'namabagian' => 'required|min:2|max:255',
                 'pengelola_akun' => 'in:true,false,1,0',
                 'status' => 'required|in:aktif,nonaktif'
             ];
@@ -136,34 +147,34 @@ class SettingBidangController extends Controller {
             if (!$validator->validate($rules)) {
                 $firstError = array_values($validator->errors())[0][0] ?? 'Validasi gagal';
                 Message::error($firstError);
-                $this->redirect("/setting-bidang/edit/{$id}");
+                $this->redirect("/setting-bagian/edit/{$id}");
             }
             
             $model->update($id, $data);
             
-            Message::success('Setting Bidang berhasil diupdate');
-            $this->redirect('/setting-bidang');
+            Message::success('Setting Bagian berhasil diupdate');
+            $this->redirect('/setting-bagian');
         }
         
-        $data = ['item' => $item];
-        $this->view('Reference/setting-bidang/edit', $data);
+        $data = ['item' => $item, 'users' => $users];
+        $this->view('Master/setting-bagian/edit', $data);
     }
     
     public function delete($id) {
         Auth::requireRole(['admin', 'manajemen']);
         
-        $model = new SettingBidang();
+        $model = new SettingBagian();
         $item = $model->findById($id);
         
         if (!$item) {
-            Message::error('Setting Bidang tidak ditemukan');
-            $this->redirect('/setting-bidang');
+            Message::error('Setting Bagian tidak ditemukan');
+            $this->redirect('/setting-bagian');
         }
         
         $model->delete($id);
         
-        Message::success('Setting Bidang berhasil dihapus');
-        $this->redirect('/setting-bidang');
+        Message::success('Setting Bagian berhasil dihapus');
+        $this->redirect('/setting-bagian');
     }
 }
 

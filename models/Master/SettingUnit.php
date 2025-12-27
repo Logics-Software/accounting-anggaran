@@ -1,10 +1,10 @@
 <?php
-namespace Models\Reference;
+namespace Models\Master;
 
 use Database;
 use Cache;
 
-class SettingBidang {
+class SettingUnit {
     private $db;
     
     public function __construct() {
@@ -12,13 +12,17 @@ class SettingBidang {
     }
     
     public function findById($id) {
-        $sql = "SELECT * FROM setting_bidang WHERE id = ?";
+        $sql = "SELECT su.*, sb.namabagian, u.namalengkap as nama_pimpinan, u.username as username_pimpinan 
+                FROM setting_unit su 
+                LEFT JOIN setting_bagian sb ON su.id_bagian = sb.id 
+                LEFT JOIN users u ON su.id_pimpinan = u.id 
+                WHERE su.id = ?";
         return $this->db->fetchOne($sql, [$id]);
     }
     
-    public function getAll($page = 1, $perPage = 10, $search = '', $sortBy = 'id', $sortOrder = 'ASC') {
+    public function getAll($page = 1, $perPage = 10, $search = '', $sortBy = 'id', $sortOrder = 'ASC', $filterBagian = '') {
         // Generate cache key
-        $cacheKey = "setting_bidang_all_{$page}_{$perPage}_" . md5($search) . "_{$sortBy}_{$sortOrder}";
+        $cacheKey = "setting_unit_all_{$page}_{$perPage}_" . md5($search) . "_" . md5($filterBagian) . "_{$sortBy}_{$sortOrder}";
         
         // Try cache first (5 minutes TTL)
         $cached = Cache::get($cacheKey);
@@ -32,16 +36,25 @@ class SettingBidang {
         $params = [];
         
         if (!empty($search)) {
-            $where .= " AND (namabidang LIKE ?)";
+            $where .= " AND (su.namaunit LIKE ? OR su.jabatan_pimpinan LIKE ? OR sb.namabagian LIKE ? OR u.namalengkap LIKE ?)";
             $searchParam = "%{$search}%";
-            $params = [$searchParam];
+            $params = [$searchParam, $searchParam, $searchParam, $searchParam];
         }
         
-        $validSortColumns = ['id', 'namabidang', 'pengelola_akun', 'status', 'created_at'];
+        if (!empty($filterBagian)) {
+            $where .= " AND su.id_bagian = ?";
+            $params[] = (int)$filterBagian;
+        }
+        
+        $validSortColumns = ['id', 'namaunit', 'jabatan_pimpinan', 'status', 'created_at'];
         $sortBy = in_array($sortBy, $validSortColumns) ? $sortBy : 'id';
         $sortOrder = strtoupper($sortOrder) === 'DESC' ? 'DESC' : 'ASC';
         
-        $sql = "SELECT * FROM setting_bidang WHERE {$where} ORDER BY {$sortBy} {$sortOrder} LIMIT ? OFFSET ?";
+        $sql = "SELECT su.*, sb.namabagian, u.namalengkap as nama_pimpinan, u.username as username_pimpinan 
+                FROM setting_unit su 
+                LEFT JOIN setting_bagian sb ON su.id_bagian = sb.id 
+                LEFT JOIN users u ON su.id_pimpinan = u.id 
+                WHERE {$where} ORDER BY su.{$sortBy} {$sortOrder} LIMIT ? OFFSET ?";
         $params[] = $perPage;
         $params[] = $offset;
         
@@ -53,9 +66,9 @@ class SettingBidang {
         return $result;
     }
     
-    public function count($search = '') {
+    public function count($search = '', $filterBagian = '') {
         // Generate cache key
-        $cacheKey = "setting_bidang_count_" . md5($search);
+        $cacheKey = "setting_unit_count_" . md5($search) . "_" . md5($filterBagian);
         
         // Try cache first (5 minutes TTL)
         $cached = Cache::get($cacheKey);
@@ -67,12 +80,20 @@ class SettingBidang {
         $params = [];
         
         if (!empty($search)) {
-            $where .= " AND (namabidang LIKE ?)";
+            $where .= " AND (su.namaunit LIKE ? OR su.jabatan_pimpinan LIKE ? OR sb.namabagian LIKE ? OR u.namalengkap LIKE ?)";
             $searchParam = "%{$search}%";
-            $params = [$searchParam];
+            $params = [$searchParam, $searchParam, $searchParam, $searchParam];
         }
         
-        $sql = "SELECT COUNT(*) as total FROM setting_bidang WHERE {$where}";
+        if (!empty($filterBagian)) {
+            $where .= " AND su.id_bagian = ?";
+            $params[] = (int)$filterBagian;
+        }
+        
+        $sql = "SELECT COUNT(*) as total FROM setting_unit su 
+                LEFT JOIN setting_bagian sb ON su.id_bagian = sb.id 
+                LEFT JOIN users u ON su.id_pimpinan = u.id 
+                WHERE {$where}";
         $result = $this->db->fetchOne($sql, $params);
         $total = $result['total'] ?? 0;
         
@@ -83,12 +104,14 @@ class SettingBidang {
     }
     
     public function create($data) {
-        $sql = "INSERT INTO setting_bidang (namabidang, pengelola_akun, status) 
-                VALUES (?, ?, ?)";
+        $sql = "INSERT INTO setting_unit (namaunit, id_bagian, jabatan_pimpinan, id_pimpinan, status) 
+                VALUES (?, ?, ?, ?, ?)";
         
         $params = [
-            $data['namabidang'],
-            isset($data['pengelola_akun']) ? ($data['pengelola_akun'] ? 1 : 0) : 0,
+            $data['namaunit'],
+            !empty($data['id_bagian']) ? (int)$data['id_bagian'] : null,
+            $data['jabatan_pimpinan'] ?? null,
+            !empty($data['id_pimpinan']) ? (int)$data['id_pimpinan'] : null,
             $data['status'] ?? 'aktif'
         ];
         
@@ -105,13 +128,13 @@ class SettingBidang {
         $fields = [];
         $params = [];
         
-        $allowedFields = ['namabidang', 'pengelola_akun', 'status'];
+        $allowedFields = ['namaunit', 'id_bagian', 'jabatan_pimpinan', 'id_pimpinan', 'status'];
         
         foreach ($allowedFields as $field) {
             if (isset($data[$field])) {
-                if ($field === 'pengelola_akun') {
+                if (in_array($field, ['id_bagian', 'id_pimpinan'])) {
                     $fields[] = "{$field} = ?";
-                    $params[] = (int)$data[$field];
+                    $params[] = !empty($data[$field]) ? (int)$data[$field] : null;
                 } else {
                     $fields[] = "{$field} = ?";
                     $params[] = $data[$field];
@@ -124,26 +147,31 @@ class SettingBidang {
         }
         
         $params[] = $id;
-        $sql = "UPDATE setting_bidang SET " . implode(', ', $fields) . " WHERE id = ?";
+        $sql = "UPDATE setting_unit SET " . implode(', ', $fields) . " WHERE id = ?";
         
         $result = $this->db->query($sql, $params);
         
         // Invalidate cache
         $this->invalidateCache();
-        Cache::delete("setting_bidang_{$id}");
+        Cache::delete("setting_unit_{$id}");
         
         return $result;
     }
     
     public function delete($id) {
-        $sql = "DELETE FROM setting_bidang WHERE id = ?";
+        $sql = "DELETE FROM setting_unit WHERE id = ?";
         $result = $this->db->query($sql, [$id]);
         
         // Invalidate cache
         $this->invalidateCache();
-        Cache::delete("setting_bidang_{$id}");
+        Cache::delete("setting_unit_{$id}");
         
         return $result;
+    }
+    
+    public function getByBagian($idBagian) {
+        $sql = "SELECT * FROM setting_unit WHERE id_bagian = ? AND status = 'aktif' ORDER BY namaunit";
+        return $this->db->fetchAll($sql, [$idBagian]);
     }
     
     private function invalidateCache() {
@@ -168,7 +196,7 @@ class SettingBidang {
             }
             
             $key = $data['key'];
-            if (strpos($key, 'setting_bidang_') === 0) {
+            if (strpos($key, 'setting_unit_') === 0) {
                 @unlink($file);
             }
         }

@@ -69,7 +69,6 @@ spl_autoload_register(function ($class) use ($baseDir) {
     $paths[] = $baseDir . '/models/Common/' . $class . '.php';
     $paths[] = $baseDir . '/models/Master/' . $class . '.php';
     $paths[] = $baseDir . '/models/Transaction/' . $class . '.php';
-    $paths[] = $baseDir . '/models/Reference/' . $class . '.php';
     $paths[] = $baseDir . '/models/Accounting/' . $class . '.php';
     $paths[] = $baseDir . '/models/' . $classPath . '.php';
     
@@ -223,28 +222,28 @@ $router->post('/messages/store', 'Controllers\Common\MessageController', 'store'
 $router->get('/messages', 'Controllers\Common\MessageController', 'index');
 
 // Setting Bidang routes (admin/manajemen only)
-$router->get('/setting-bidang', 'Controllers\Reference\SettingBidangController', 'index');
-$router->get('/setting-bidang/create', 'Controllers\Reference\SettingBidangController', 'create');
-$router->post('/setting-bidang/create', 'Controllers\Reference\SettingBidangController', 'create');
-$router->get('/setting-bidang/edit/{id}', 'Controllers\Reference\SettingBidangController', 'edit');
-$router->post('/setting-bidang/edit/{id}', 'Controllers\Reference\SettingBidangController', 'edit');
-$router->get('/setting-bidang/delete/{id}', 'Controllers\Reference\SettingBidangController', 'delete');
+$router->get('/setting-bidang', 'Controllers\Master\SettingBidangController', 'index');
+$router->get('/setting-bidang/create', 'Controllers\Master\SettingBidangController', 'create');
+$router->post('/setting-bidang/create', 'Controllers\Master\SettingBidangController', 'create');
+$router->get('/setting-bidang/edit/{id}', 'Controllers\Master\SettingBidangController', 'edit');
+$router->post('/setting-bidang/edit/{id}', 'Controllers\Master\SettingBidangController', 'edit');
+$router->get('/setting-bidang/delete/{id}', 'Controllers\Master\SettingBidangController', 'delete');
 
 // Setting Bagian routes (admin/manajemen only)
-$router->get('/setting-bagian', 'Controllers\Reference\SettingBagianController', 'index');
-$router->get('/setting-bagian/create', 'Controllers\Reference\SettingBagianController', 'create');
-$router->post('/setting-bagian/create', 'Controllers\Reference\SettingBagianController', 'create');
-$router->get('/setting-bagian/edit/{id}', 'Controllers\Reference\SettingBagianController', 'edit');
-$router->post('/setting-bagian/edit/{id}', 'Controllers\Reference\SettingBagianController', 'edit');
-$router->get('/setting-bagian/delete/{id}', 'Controllers\Reference\SettingBagianController', 'delete');
+$router->get('/setting-bagian', 'Controllers\Master\SettingBagianController', 'index');
+$router->get('/setting-bagian/create', 'Controllers\Master\SettingBagianController', 'create');
+$router->post('/setting-bagian/create', 'Controllers\Master\SettingBagianController', 'create');
+$router->get('/setting-bagian/edit/{id}', 'Controllers\Master\SettingBagianController', 'edit');
+$router->post('/setting-bagian/edit/{id}', 'Controllers\Master\SettingBagianController', 'edit');
+$router->get('/setting-bagian/delete/{id}', 'Controllers\Master\SettingBagianController', 'delete');
 
 // Setting Unit routes (admin/manajemen only)
-$router->get('/setting-unit', 'Controllers\Reference\SettingUnitController', 'index');
-$router->get('/setting-unit/create', 'Controllers\Reference\SettingUnitController', 'create');
-$router->post('/setting-unit/create', 'Controllers\Reference\SettingUnitController', 'create');
-$router->get('/setting-unit/edit/{id}', 'Controllers\Reference\SettingUnitController', 'edit');
-$router->post('/setting-unit/edit/{id}', 'Controllers\Reference\SettingUnitController', 'edit');
-$router->get('/setting-unit/delete/{id}', 'Controllers\Reference\SettingUnitController', 'delete');
+$router->get('/setting-unit', 'Controllers\Master\SettingUnitController', 'index');
+$router->get('/setting-unit/create', 'Controllers\Master\SettingUnitController', 'create');
+$router->post('/setting-unit/create', 'Controllers\Master\SettingUnitController', 'create');
+$router->get('/setting-unit/edit/{id}', 'Controllers\Master\SettingUnitController', 'edit');
+$router->post('/setting-unit/edit/{id}', 'Controllers\Master\SettingUnitController', 'edit');
+$router->get('/setting-unit/delete/{id}', 'Controllers\Master\SettingUnitController', 'delete');
 
 // Master Akun routes (admin/manajemen only)
 $router->get('/master-akun', 'Controllers\Master\MasterAkunController', 'index');
@@ -255,6 +254,41 @@ $router->post('/master-akun/edit/{id}', 'Controllers\Master\MasterAkunController
 $router->get('/master-akun/delete/{id}', 'Controllers\Master\MasterAkunController', 'delete');
 $router->get('/master-akun/export/excel', 'Controllers\Master\MasterAkunController', 'exportExcel');
 $router->get('/master-akun/export/pdf', 'Controllers\Master\MasterAkunController', 'exportPdf');
+
+// Setting Jurnal routes (admin/manajemen only)
+$router->get('/setting-jurnal', 'Controllers\Master\SettingJurnalController', 'index');
+$router->post('/setting-jurnal/store', 'Controllers\Master\SettingJurnalController', 'store');
+
+// Periode Akuntansi routes (admin/manajemen only)
+$router->get('/periode-akuntansi', 'Controllers\Master\PeriodeAkuntansiController', 'index');
+$router->get('/periode-akuntansi/buka-periode', 'Controllers\Master\PeriodeAkuntansiController', 'bukaPeriode');
+$router->post('/periode-akuntansi/proses-buka-periode', 'Controllers\Master\PeriodeAkuntansiController', 'prosesBukaPeriode');
+$router->get('/periode-akuntansi/create', 'Controllers\Master\PeriodeAkuntansiController', 'create');
+$router->post('/periode-akuntansi/create', 'Controllers\Master\PeriodeAkuntansiController', 'create');
+$router->get('/periode-akuntansi/edit/{id}', 'Controllers\Master\PeriodeAkuntansiController', 'edit');
+$router->post('/periode-akuntansi/edit/{id}', 'Controllers\Master\PeriodeAkuntansiController', 'edit');
+$router->get('/periode-akuntansi/delete/{id}', 'Controllers\Master\PeriodeAkuntansiController', 'delete');
+$router->get('/periode-akuntansi/active', 'Controllers\Master\PeriodeAkuntansiController', 'getActive');
+
+// Saldo Akun routes (admin/manajemen only)
+$router->get('/saldo-akun', 'Controllers\Master\SaldoAkunController', 'index');
+$router->get('/saldo-akun/create', 'Controllers\Master\SaldoAkunController', 'create');
+$router->post('/saldo-akun/create', 'Controllers\Master\SaldoAkunController', 'create');
+$router->get('/saldo-akun/edit/{id}', 'Controllers\Master\SaldoAkunController', 'edit');
+$router->post('/saldo-akun/edit/{id}', 'Controllers\Master\SaldoAkunController', 'edit');
+$router->get('/saldo-akun/delete/{id}', 'Controllers\Master\SaldoAkunController', 'delete');
+$router->get('/saldo-akun/periode/{periode}', 'Controllers\Master\SaldoAkunController', 'getByPeriode');
+$router->get('/saldo-akun/akun/{idAkun}', 'Controllers\Master\SaldoAkunController', 'getByAkun');
+$router->post('/saldo-akun/update-or-create', 'Controllers\Master\SaldoAkunController', 'updateOrCreate');
+
+// Jurnal routes (admin/manajemen only)
+$router->get('/jurnal', 'Controllers\Transaction\JurnalController', 'index');
+$router->get('/jurnal/create', 'Controllers\Transaction\JurnalController', 'create');
+$router->post('/jurnal/store', 'Controllers\Transaction\JurnalController', 'store');
+$router->get('/jurnal/edit/{id}', 'Controllers\Transaction\JurnalController', 'edit');
+$router->post('/jurnal/edit/{id}', 'Controllers\Transaction\JurnalController', 'update');
+$router->get('/jurnal/generate-no', 'Controllers\Transaction\JurnalController', 'generateNoJurnal');
+$router->get('/jurnal/delete/{id}', 'Controllers\Transaction\JurnalController', 'delete');
 
 // Dispatch
 $router->dispatch();

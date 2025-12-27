@@ -1,5 +1,5 @@
 <?php
-namespace Models\Reference;
+namespace Models\Master;
 
 use Database;
 use Cache;

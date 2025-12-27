@@ -343,63 +343,13 @@ if (Auth::check() && $currentUser): ?><header class="app-header">
                     <?= icon('gear', 'me-2', 20) ?>
                     <span>Konfigurasi</span>
                 </a>
-                
-                <!-- Menu Setting Pemakai Anggaran Dropdown -->
-                <?php
-                $currentPath = $_SERVER['REQUEST_URI'] ?? '';
-                $isSettingBidang = strpos($currentPath, '/setting-bidang') !== false;
-                $isSettingBagian = strpos($currentPath, '/setting-bagian') !== false;
-                $isSettingUnit = strpos($currentPath, '/setting-unit') !== false;
-                $isAnySettingActive = $isSettingBidang || $isSettingBagian || $isSettingUnit;
-                ?>
-                <div class="sidebar-nav-dropdown <?= $isAnySettingActive ? 'open' : '' ?>" data-dropdown="setting-anggaran">
-                    <a href="#" class="sidebar-nav-item sidebar-nav-dropdown-toggle <?= $isAnySettingActive ? 'active' : '' ?>" id="settingAnggaranDropdownToggle">
-                        <?= icon('layer-group', 'me-2', 20) ?>
-                        <span>Pemakai Anggaran</span>
-                        <?= icon('caret-right', 'ms-auto dropdown-arrow', 16) ?>
-                    </a>
-                    <div class="sidebar-nav-dropdown-menu" id="settingAnggaranDropdownMenu">
-                        <?php
-                        $currentPath = $_SERVER['REQUEST_URI'] ?? '';
-                        $isSettingBidang = strpos($currentPath, '/setting-bidang') !== false;
-                        $isSettingBagian = strpos($currentPath, '/setting-bagian') !== false;
-                        $isSettingUnit = strpos($currentPath, '/setting-unit') !== false;
-                        ?>
-                        <a href="/setting-bidang" class="sidebar-nav-dropdown-item <?= $isSettingBidang ? 'active' : '' ?>">
-                            <span>Bidang</span>
-                        </a>
-                        <a href="/setting-bagian" class="sidebar-nav-dropdown-item <?= $isSettingBagian ? 'active' : '' ?>">
-                            <span>Bagian/Fakultas</span>
-                        </a>
-                        <a href="/setting-unit" class="sidebar-nav-dropdown-item <?= $isSettingUnit ? 'active' : '' ?>">
-                            <span>Unit/Prodi</span>
-                        </a>
-                    </div>
-                    <div class="sidebar-nav-dropdown-popup" id="settingAnggaranDropdownPopup">
-                        <a href="/setting-bidang" class="sidebar-nav-dropdown-popup-item <?= $isSettingBidang ? 'active' : '' ?>">
-                            <span>Bidang</span>
-                        </a>
-                        <a href="/setting-bagian" class="sidebar-nav-dropdown-popup-item <?= $isSettingBagian ? 'active' : '' ?>">
-                            <span>Bagian/Fakultas</span>
-                        </a>
-                        <a href="/setting-unit" class="sidebar-nav-dropdown-popup-item <?= $isSettingUnit ? 'active' : '' ?>">
-                            <span>Unit/Prodi</span>
-                        </a>
-                    </div>
-                </div>
-                
+                                
                 <a href="/users" class="sidebar-nav-item <?= strpos($_SERVER['REQUEST_URI'] ?? '', '/users') !== false ? 'active' : '' ?>">
                     <?= icon('users', 'me-2', 20) ?>
                     <span>Manajemen User</span>
                 </a>
                 
-                <!-- Menu Master Akun -->
-                <a href="/master-akun" class="sidebar-nav-item <?= strpos($_SERVER['REQUEST_URI'] ?? '', '/master-akun') !== false ? 'active' : '' ?>">
-                    <?= icon('at', 'me-2', 20) ?>
-                    <span>Master Akun</span>
-                </a>
-                
-                <!-- Menu Daftar Log Dropdown -->
+                <!-- Menu Master Log Dropdown -->
                 <?php
                 $currentPath = $_SERVER['REQUEST_URI'] ?? '';
                 $isLoginLog = strpos($currentPath, '/login-logs') !== false;
@@ -450,7 +400,86 @@ if (Auth::check() && $currentUser): ?><header class="app-header">
             </div>
             <?php endif; ?>
 
-            <!-- Menu Setting -->
+            <!-- Menu Master -->
+            <?php if (Auth::isAdmin() || Auth::isManajemen()): ?>
+            <div class="sidebar-nav-group">
+                <div class="sidebar-nav-group-title">Master</div>
+                <!-- Menu Setting Jurnal -->
+                <a href="/setting-jurnal" class="sidebar-nav-item <?= strpos($_SERVER['REQUEST_URI'] ?? '', '/setting-jurnal') !== false ? 'active' : '' ?>">
+                    <?= icon('file-invoice', 'me-2', 20) ?>
+                    <span>Setting Jurnal</span>
+                </a>
+                <!-- Menu Setting Pemakai Anggaran Dropdown -->
+                <?php
+                $currentPath = $_SERVER['REQUEST_URI'] ?? '';
+                $isSettingBidang = strpos($currentPath, '/setting-bidang') !== false;
+                $isSettingBagian = strpos($currentPath, '/setting-bagian') !== false;
+                $isSettingUnit = strpos($currentPath, '/setting-unit') !== false;
+                $isAnySettingActive = $isSettingBidang || $isSettingBagian || $isSettingUnit;
+                ?>
+                <div class="sidebar-nav-dropdown <?= $isAnySettingActive ? 'open' : '' ?>" data-dropdown="setting-anggaran">
+                    <a href="#" class="sidebar-nav-item sidebar-nav-dropdown-toggle <?= $isAnySettingActive ? 'active' : '' ?>" id="settingAnggaranDropdownToggle">
+                        <?= icon('layer-group', 'me-2', 20) ?>
+                        <span>Pemakai Anggaran</span>
+                        <?= icon('caret-right', 'ms-auto dropdown-arrow', 16) ?>
+                    </a>
+                    <div class="sidebar-nav-dropdown-menu" id="settingAnggaranDropdownMenu">
+                        <?php
+                        $currentPath = $_SERVER['REQUEST_URI'] ?? '';
+                        $isSettingBidang = strpos($currentPath, '/setting-bidang') !== false;
+                        $isSettingBagian = strpos($currentPath, '/setting-bagian') !== false;
+                        $isSettingUnit = strpos($currentPath, '/setting-unit') !== false;
+                        ?>
+                        <a href="/setting-bidang" class="sidebar-nav-dropdown-item <?= $isSettingBidang ? 'active' : '' ?>">
+                            <span>Bidang</span>
+                        </a>
+                        <a href="/setting-bagian" class="sidebar-nav-dropdown-item <?= $isSettingBagian ? 'active' : '' ?>">
+                            <span>Bagian/Fakultas</span>
+                        </a>
+                        <a href="/setting-unit" class="sidebar-nav-dropdown-item <?= $isSettingUnit ? 'active' : '' ?>">
+                            <span>Unit/Prodi</span>
+                        </a>
+                    </div>
+                    <div class="sidebar-nav-dropdown-popup" id="settingAnggaranDropdownPopup">
+                        <a href="/setting-bidang" class="sidebar-nav-dropdown-popup-item <?= $isSettingBidang ? 'active' : '' ?>">
+                            <span>Bidang</span>
+                        </a>
+                        <a href="/setting-bagian" class="sidebar-nav-dropdown-popup-item <?= $isSettingBagian ? 'active' : '' ?>">
+                            <span>Bagian/Fakultas</span>
+                        </a>
+                        <a href="/setting-unit" class="sidebar-nav-dropdown-popup-item <?= $isSettingUnit ? 'active' : '' ?>">
+                            <span>Unit/Prodi</span>
+                        </a>
+                    </div>
+                </div>
+                <!-- Menu Master Akun -->
+                <a href="/master-akun" class="sidebar-nav-item <?= strpos($_SERVER['REQUEST_URI'] ?? '', '/master-akun') !== false ? 'active' : '' ?>">
+                    <?= icon('at', 'me-2', 20) ?>
+                    <span>Master Akun</span>
+                </a>
+                
+                <!-- Menu Buka Periode Akuntansi -->
+                <a href="/periode-akuntansi/buka-periode" class="sidebar-nav-item <?= strpos($_SERVER['REQUEST_URI'] ?? '', '/periode-akuntansi/buka-periode') !== false ? 'active' : '' ?>">
+                    <?= icon('calendar-check', 'me-2', 20) ?>
+                    <span>Buka Periode Akuntansi</span>
+                </a>
+            </div>
+            <?php endif; ?>
+
+            <!-- Menu Transaksi -->
+            <?php if (Auth::isAdmin() || Auth::isManajemen()): ?>
+            <div class="sidebar-nav-group">
+                <div class="sidebar-nav-group-title">Transaksi</div>
+
+                <!-- Menu Jurnal -->
+                <a href="/jurnal" class="sidebar-nav-item <?= strpos($_SERVER['REQUEST_URI'] ?? '', '/jurnal') !== false ? 'active' : '' ?>">
+                    <?= icon('file-invoice', 'me-2', 20) ?>
+                    <span>Jurnal</span>
+                </a>
+            </div>
+            <?php endif; ?>
+
+            <!-- Menu Laporan -->
             <div class="sidebar-nav-group">
                 <div class="sidebar-nav-group-title">Laporan</div>
 
@@ -464,7 +493,7 @@ if (Auth::check() && $currentUser): ?><header class="app-header">
                 ?>
                 <div class="sidebar-nav-dropdown <?= $isAnyLaporanActive ? 'open' : '' ?>" data-dropdown="laporan">
                     <a href="#" class="sidebar-nav-item sidebar-nav-dropdown-toggle <?= $isAnyLaporanActive ? 'active' : '' ?>" id="laporanDropdownToggle">
-                        <?= icon('file-invoice-dollar', 'me-2', 20) ?>
+                        <?= icon('print-menu', 'me-2', 20) ?>
                         <span>Laporan</span>
                         <?= icon('caret-right', 'ms-auto dropdown-arrow', 16) ?>
                     </a>

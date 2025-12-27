@@ -1,12 +1,12 @@
 <?php
-namespace Controllers\Reference;
+namespace Controllers\Master;
 
 use Controller;
 use Auth;
 use Message;
 use Session;
-use Models\Reference\SettingUnit;
-use Models\Reference\SettingBagian;
+use Models\Master\SettingUnit;
+use Models\Master\SettingBagian;
 use Models\Common\User;
 use Validator;
 use Sanitizer;
@@ -62,7 +62,7 @@ class SettingUnitController extends Controller {
             'sortOrder' => $sortOrder
         ];
         
-        $this->view('Reference/setting-unit/index', $data);
+        $this->view('Master/setting-unit/index', $data);
     }
     
     public function create() {
@@ -105,7 +105,7 @@ class SettingUnitController extends Controller {
         }
         
         $data = ['bagians' => $bagians, 'users' => $users];
-        $this->view('Reference/setting-unit/create', $data);
+        $this->view('Master/setting-unit/create', $data);
     }
     
     public function edit($id) {
@@ -155,7 +155,7 @@ class SettingUnitController extends Controller {
         }
         
         $data = ['item' => $item, 'bagians' => $bagians, 'users' => $users];
-        $this->view('Reference/setting-unit/edit', $data);
+        $this->view('Master/setting-unit/edit', $data);
     }
     
     public function delete($id) {

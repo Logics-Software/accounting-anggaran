@@ -1,0 +1,26 @@
+CREATE TABLE IF NOT EXISTS `header_jurnal` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `periode` varchar(6) NOT NULL COMMENT 'YYYYMM (Tahun Bulan) - periode aktif',
+  `tipejurnal` enum('UMUM','PENYESUAIAN','NERACA AWAL') NOT NULL DEFAULT 'UMUM',
+  `nojurnal` varchar(20) NOT NULL,
+  `tanggaljurnal` datetime NOT NULL COMMENT 'Tanggal jurnal harus sesuai dengan periode aktif',
+  `noreferensi` varchar(50) DEFAULT NULL,
+  `keterangan` varchar(254) DEFAULT NULL,
+  `posting` enum('NON POSTING','JURNAL KAS','JURNAL ANGGARAN') NOT NULL DEFAULT 'NON POSTING',
+  `nomor_posting` varchar(20) DEFAULT NULL COMMENT 'Digunakan jika posting <> NON POSTING',
+  `totaldebet` decimal(18,2) NOT NULL DEFAULT 0.00,
+  `totalkredit` decimal(18,2) NOT NULL DEFAULT 0.00,
+  `approvement` enum('APPROVAL','APPROVED','DECLINED') NOT NULL DEFAULT 'APPROVAL',
+  `id_user` int(11) DEFAULT NULL COMMENT 'User pemroses transaksi',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_nojurnal_periode` (`nojurnal`, `periode`),
+  KEY `idx_periode` (`periode`),
+  KEY `idx_tipejurnal` (`tipejurnal`),
+  KEY `idx_tanggaljurnal` (`tanggaljurnal`),
+  KEY `idx_approvement` (`approvement`),
+  KEY `idx_id_user` (`id_user`),
+  FOREIGN KEY (`id_user`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
